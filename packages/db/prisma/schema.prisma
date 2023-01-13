@@ -1,0 +1,77 @@
+//
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+//
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex", "orderByNulls"]
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum AccountRole {
+  user
+  admin
+  moderator
+}
+
+enum AccountType {
+  buyer
+  standart
+}
+
+enum AccountStatus {
+  approved
+  unapproved
+  rejected
+}
+
+model Account {
+  id            String         @id @default(uuid())
+  displayName   String         @map("display_name") @db.Text
+  phone         Int?
+  email         String         @unique
+  emailVerified DateTime?      @map("email_verified")
+  password      String         @db.Text
+  image         String?
+  role          AccountRole?   @default(user)
+  status        AccountStatus? @default(unapproved)
+  terms         Boolean?       @default(false)
+  type          AccountType
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt
+
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  refreshToken String?  @map("refresh_token") @db.Text
+  accessToken  String?  @map("access_token") @db.Text
+  expiresAt    Int?     @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt
+
+  @@map("sessions")
+}
+
+model Contact {
+  id        String   @id @default(uuid())
+  fullName  String   @map("full_name") @db.Text
+  phone     String?
+  email     String
+  message   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt
+
+  @@map("contact")
+}
+
+//
+// END
+//
